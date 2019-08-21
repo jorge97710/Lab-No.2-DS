@@ -50,7 +50,23 @@ cuantitativas<-data.frame(
 #-------------------------------------------------
 # Regresión Lineal Múltiple 
 #-------------------------------------------------
-
+library(caret)
+install.packages("caret")
 fitLM<-lm(SalePrice~TotalBsmtSF+X1stFlrSF+GrLivArea+GarageCars+GarageArea+GarageYrBlt+YearBuilt+YearRemodAdd +MasVnrArea+Fireplaces,data = cuantitativas)
+fitLM<-lm(SalePrice~GrLivArea,data = cuantitativas)
 
 summary(fitLM)
+predicted<-predict(fitLM,newdata = test)
+
+test$prediccion <- predicted
+test$prediccionModeloAjustado<-round(test$prediccion,0)
+test$SalePriceajustado <-round(test$SalePrice,0)
+
+cfm<-confusionMatrix(test$SalePriceajustado,test$prediccionModeloAjustado)
+
+
+##alterna, problema por factores
+a <- union(test$SalePriceajustado, test$prediccionModeloAjustado)
+s <- table(factor(test$SalePriceajustado, a), factor(test$prediccionModeloAjustado, a))
+confusionMatrix(s)
+
