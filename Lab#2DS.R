@@ -4,7 +4,7 @@ train <- read.csv(file="train.csv", header=TRUE)
 
 #simple random sample for 60% train and 40% test. based on train 
 porcentaje<-0.6
-
+set.seed(8)
 corte <- sample(nrow(train),nrow(train)*porcentaje)
 train<-train[corte,]
 test<-train[-corte,]
@@ -51,22 +51,18 @@ cuantitativas<-data.frame(
 # Regresión Lineal Múltiple 
 #-------------------------------------------------
 library(caret)
-install.packages("caret")
-fitLM<-lm(SalePrice~TotalBsmtSF+X1stFlrSF+GrLivArea+GarageCars+GarageArea+GarageYrBlt+YearBuilt+YearRemodAdd +MasVnrArea+Fireplaces,data = cuantitativas)
-fitLM<-lm(SalePrice~GrLivArea,data = cuantitativas)
-
+##  install.packages("caret")
+fitLM<-lm(SalePrice~TotalBsmtSF+X1stFlrSF+GrLivArea+GarageCars+GarageArea+GarageYrBlt+YearBuilt+YearRemodAdd +MasVnrArea+Fireplaces,data = train)
+1/(1-summary(fitLM)$r.squared)
 summary(fitLM)
-predicted<-predict(fitLM,newdata = test)
+plot(fitLM)
+confint(fitLM)
+##prueba 
+predicted<-predict(fitLM,newdata = train,na.action = na.pass)
+train$prediccion <- predicted
+train$prediccionModeloAjustado<-round(train$prediccion,0)
+train$SalePriceajustado <-round(train$SalePrice,0)
 
-test$prediccion <- predicted
-test$prediccionModeloAjustado<-round(test$prediccion,0)
-test$SalePriceajustado <-round(test$SalePrice,0)
-
-cfm<-confusionMatrix(test$SalePriceajustado,test$prediccionModeloAjustado)
-
-
-##alterna, problema por factores
-a <- union(test$SalePriceajustado, test$prediccionModeloAjustado)
-s <- table(factor(test$SalePriceajustado, a), factor(test$prediccionModeloAjustado, a))
-confusionMatrix(s)
+install.packages("devtools")
+devtools::install_github("cardiomoon/ggiraphExtra")
 
