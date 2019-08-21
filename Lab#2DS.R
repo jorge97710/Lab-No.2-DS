@@ -46,9 +46,11 @@ cuantitativas<-data.frame(
   "SalePrice"=train$SalePrice
 )
 
+
 #-------------------------------------------------
-# Regresión Lineal Simple 
+# Regresión Lineal Múltiple 
 #-------------------------------------------------
 
-rls <- lm()
-fitLMPW<-lm(Petal.Length~Petal.Width, data = train)
+fitLM<-lm(SalePrice~TotalBsmtSF+X1stFlrSF+GrLivArea+GarageCars+GarageArea+GarageYrBlt+YearBuilt+YearRemodAdd +MasVnrArea+Fireplaces,data = cuantitativas)
+
+summary(fitLM)
