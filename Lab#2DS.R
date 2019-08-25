@@ -48,7 +48,7 @@ cuantitativas<-data.frame(
 
 
 #-------------------------------------------------
-# Regresión Lineal Múltiple 
+# RegresiÃ³n Lineal MÃºltiple 
 #-------------------------------------------------
 library(caret)
 ##  install.packages("caret")
@@ -66,3 +66,26 @@ train$SalePriceajustado <-round(train$SalePrice,0)
 install.packages("devtools")
 devtools::install_github("cardiomoon/ggiraphExtra")
 
+#regresion lineal
+trainSet = read.csv("train.csv") 
+testSet = read.csv("test.csv")
+trainSetData <- data.frame(trainSet)
+testSetData <- data.frame(testSet)
+all <- merge(trainSetData, testSetData, all = TRUE)
+set.seed(452)
+filatrain <- sample(1:nrow(all), 0.6*nrow(all))
+datatrain <-all[filatrain,]
+prueba <- all[-filatrain,]
+datatrain <- datatrain[complete.cases(datatrain),]
+prueba <- prueba[complete.cases(prueba),]
+datatrain <- within(datatrain, rm("TotalBsmtSF","GrLivArea"))
+prueba <- within(prueba,rm("TotalBsmtSF","GrLivArea"))
+lmodel <- lm(SalePrice ~ ., data = datatrain)
+summary(lmodel)
+sigma(lmodel)/mean(datatrain$SalePrice)
+predL<-predict(lmodel, newdata = prueba, interval = "confidence", level = .95)
+predL
+resultados<-data.frame(prueba$SalePrice,predL)
+resultado<-abs(resultados$prueba.SalePrice-resultados$predL)
+resultado
+summary(resultado)
