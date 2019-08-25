@@ -89,3 +89,25 @@ resultados<-data.frame(prueba$SalePrice,predL)
 resultado<-abs(resultados$prueba.SalePrice-resultados$predL)
 resultado
 summary(resultado)
+
+library(class)
+predKnn<-knn(trainSet[,c(1:8,10:11)],testSet[,c(1:8,10:11)],as.factor(trainSet$SalePrice),k=3)
+cfm<-confusionMatrix(as.factor(testSet$TotalBsmtSF),predKnn)
+cfm
+
+#Con caret usando validaci�n cruzada
+set.seed(123)
+trctrl <- trainControl(method = "repeatedcv",
+                           number = 10,
+                           repeats = 3)
+
+trainSet$am<-as.factor(trainSet$)
+testSet$am<-as.factor(testSet$am)
+
+knnTrain <- train(am ~., data = trainSet, method = "knn",
+                 trControl=trctrl,
+                 preProcess = c("center", "scale"), tuneLength=10)
+predknn<-predict(knnTrain,newdata = testSet[,c(1:8,10:11)])
+summary(knnTrain)
+cfm<-confusionMatrix(as.factor(testSet$am),predKnn)
+cfm
