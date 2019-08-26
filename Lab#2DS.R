@@ -48,7 +48,7 @@ cuantitativas<-data.frame(
 
 
 #-------------------------------------------------
-# RegresiÃ³n Lineal MÃºltiple 
+# Regresión Lineal Múltiple 
 #-------------------------------------------------
 library(caret)
 ##  install.packages("caret")
@@ -95,18 +95,52 @@ predKnn<-knn(trainSet[,c(1:8,10:11)],testSet[,c(1:8,10:11)],as.factor(trainSet$S
 cfm<-confusionMatrix(as.factor(testSet$TotalBsmtSF),predKnn)
 cfm
 
-#Con caret usando validaciï¿½n cruzada
+#Con caret usando validaci???n cruzada
 set.seed(123)
-trctrl <- trainControl(method = "repeatedcv",
-                           number = 10,
-                           repeats = 3)
+trctrl <- trainControl(method = "cv",
+                       number = 10)
 
-trainSet$am<-as.factor(trainSet$)
-testSet$am<-as.factor(testSet$am)
+train$am<-as.factor(train$SalePrice)
+test$am<-as.factor(test$SalePrice)
 
-knnTrain <- train(am ~., data = trainSet, method = "knn",
-                 trControl=trctrl,
-                 preProcess = c("center", "scale"), tuneLength=10)
+#-----
+train <- complete.cases(train)
+model_caret <- train(SalePrice~TotalBsmtSF+X1stFlrSF+GrLivArea+GarageCars+GarageArea+GarageYrBlt+YearBuilt+YearRemodAdd +MasVnrArea+Fireplaces,   # model to fit
+                     data = train,                        
+                     trControl = trctrl,              # folds
+                     method = "lm",                      # specifying regression model
+                     na.action = na.pass)   
+model_caret
+
+model_caret$finalModel
+
+test$pred <-predict (model_caret, newdata = test, na.action = na.pass)
+summary(test$pred)
+
+
+model_caret$resample
+
+sd(model_caret$resample$Rsquared)
+
+summary(model_caret$resample)
+
+
+#-----
+
+#--
+fit <- train(SalePrice ~.,
+             method     = "knn",
+             tuneGrid   = expand.grid(k = 1:10),
+             trControl  = trctrl,
+             
+             data       = train,na.action = na.pass)
+
+
+#--
+
+knnTrain <- train(SalePrice ~., data = trainSet, method = "knn",
+                  trControl=trctrl,
+                  preProcess = c("center", "scale"), tuneLength=10)
 predknn<-predict(knnTrain,newdata = testSet[,c(1:8,10:11)])
 summary(knnTrain)
 cfm<-confusionMatrix(as.factor(testSet$am),predKnn)
